@@ -1,0 +1,150 @@
+﻿@using ExamAplication.Admin.Models.Lesson
+@model List<LessonList>
+
+@{
+    ViewData["Title"] = "Lesson List";
+    Layout = "_Layout";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-book-half"></i> Lessons</h2>
+    <a href="@Url.Action("Create")" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Add Lesson
+    </a>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-hover table-striped border">
+            <thead class="table-dark">
+                <tr>
+                    <th><i class="bi bi-hash"></i> ID</th>
+                    <th><i class="bi bi-journal-text"></i> Lesson Code</th>
+                    <th><i class="bi bi-card-text"></i> Lesson Name</th>
+                    <th><i class="bi bi-people"></i> Class</th>
+                    <th><i class="bi bi-person"></i> Teacher First Name</th>
+                    <th><i class="bi bi-person"></i> Teacher Last Name</th>
+                    <th><i class="bi bi-tools"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var lesson in Model)
+                {
+                    <tr>
+                        <td>@lesson.Id</td>
+                        <td>@lesson.LessonCode</td>
+                        <td>@lesson.LessonName</td>
+                        <td>@lesson.Class</td>
+                        <td>@lesson.TeacherFirstName</td>
+                        <td>@lesson.TeacherLastName</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="@Url.Action("Edit", new { id = lesson.Id })" class="btn btn-sm btn-outline-warning" title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <button class="btn btn-sm btn-outline-danger delete-lesson" data-id="@lesson.Id" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                <button class ="btn btn-sm btn-outline-secondary soft-delete" data-id="@lesson.Id" title="Soft Delete">
+                                    <i class="bi bi-person-dash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No lessons found.
+    </div>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).on('click', '.delete-lesson', function (e) {
+            e.preventDefault();
+            var lessonId = $(this).data('id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This action will permanently delete the lesson!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Lesson/Delete',
+                        type: 'POST',
+                        data: { id: lessonId },
+                        success: function () {
+                            Swal.fire(
+                                'Deleted!',
+                                'The lesson has been permanently deleted.',
+                                'success'
+                            ).then(() => {
+                                window.location.reload();
+                            });
+                        },
+                        error: function (xhr) {
+                            Swal.fire(
+                                'Error!',
+                                'An error occurred: ' + xhr.responseText,
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+
+        $(document).on('click', '.soft-delete', function (e) {
+            e.preventDefault();
+            var lessonId = $(this).data('id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This action will soft delete the lesson!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#6c757d',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, soft delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Lesson/SoftDelete',
+                        type: 'POST',
+                        data: { id: lessonId },
+                        success: function () {
+                            Swal.fire(
+                                'Soft Deleted!',
+                                'The lesson has been soft deleted.',
+                                'success'
+                            ).then(() => {
+                                window.location.reload();
+                            });
+                        },
+                        error: function (xhr) {
+                            Swal.fire(
+                                'Error!',
+                                'An error occurred: ' + xhr.responseText,
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
+

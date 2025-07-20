@@ -1,0 +1,107 @@
+﻿@using ExamAplication.Admin.Models.Exam
+@model List<ExamList>
+
+@{
+    ViewData["Title"] = "Exam List";
+    Layout = "_Layout";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-journal-check"></i> Exams</h2>
+    <a href="@Url.Action("Create")" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Add Exam
+    </a>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-hover table-striped border">
+            <thead class="table-dark">
+                <tr>
+                    <th><i class="bi bi-hash"></i> ID</th>
+                    <th><i class="bi bi-book"></i> Lesson Code</th>
+                    <th><i class="bi bi-book"></i> Lesson Name</th>
+                    <th><i class="bi bi-person"></i> Student No</th>
+                    <th><i class="bi bi-calendar-event"></i> Date</th>
+                    <th><i class="bi bi-bar-chart"></i> Grade</th>
+                    <th><i class="bi bi-tools"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var exam in Model)
+                {
+                    <tr>
+                        <td>@exam.Id</td>
+                        <td>@exam.LessonCode</td>
+                        <td>@exam.Lesson?.LessonName</td>
+                        <td>@exam.StudentNumber</td>
+                        <td>@exam.ExamDate.ToString("yyyy-MM-dd")</td>
+                        <td>@exam.Grade</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="@Url.Action("Edit", new { id = exam.Id })" class="btn btn-sm btn-outline-warning" title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <button class="btn btn-sm btn-outline-danger delete-exam" data-id="@exam.Id" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No exams found.
+    </div>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).on('click', '.delete-exam', function (e) {
+            e.preventDefault();
+            var examId = $(this).data('id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This will permanently delete the exam!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Exam/Delete',
+                        type: 'POST',
+                        data: { id: examId },
+                        success: function () {
+                            Swal.fire(
+                                'Deleted!',
+                                'The exam was successfully deleted.',
+                                'success'
+                            ).then(() => {
+                                window.location.reload();
+                            });
+                        },
+                        error: function (xhr) {
+                            Swal.fire(
+                                'Error!',
+                                'An error occurred: ' + xhr.responseText,
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

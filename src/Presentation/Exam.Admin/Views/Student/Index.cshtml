@@ -1,0 +1,197 @@
+﻿@using ExamAplication.Admin.Models.Student
+@model List<StudentList>
+
+@{
+    ViewData["Title"] = "Student List";
+    Layout = "_Layout";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-people"></i> Students</h2>
+    <a href="@Url.Action("Create")" class="btn btn-primary">
+        <i class="bi bi-person-plus"></i> Add Student
+    </a>
+</div>
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-body" style="height: 350px;">
+        <h4 class="card-title mb-3"><i class="bi bi-pie-chart"></i> Student Count by Class</h4>
+        <canvas id="studentClassPieChart" height="300"></canvas>
+    </div>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="table-responsive mt-2">
+        <table class="table table-hover table-striped border">
+            <thead class="table-dark">
+                <tr>
+                    <th><i class="bi bi-hash"></i> ID</th>
+                    <th><i class="bi bi-person"></i> Name</th>
+                    <th><i class="bi bi-person"></i> Surname</th>
+                    <th><i class="bi bi-building"></i> Class</th>
+                    <th><i class="bi bi-card-list"></i> Student No</th>
+                    <th><i class="bi bi-tools"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var student in Model)
+                {
+                    <tr>
+                        <td>@student.Id</td>
+                        <td>@student.FirstName</td>
+                        <td>@student.LastName</td>
+                        <td>@student.Class</td>
+                        <td>@student.StudentNumber</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="@Url.Action("Edit", new { id = student.Id })" class="btn btn-sm btn-outline-warning" title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <button class="btn btn-sm btn-outline-danger delete-student" data-id="@student.Id" title="Hard Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary soft-delete" data-id="@student.Id" title="Soft Delete">
+                                    <i class="bi bi-person-dash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No students found.
+    </div>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).on('click', '.delete-student', function (e) {
+            e.preventDefault();
+            var studentId = $(this).data('id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This will permanently delete the student!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Student/Delete',
+                        type: 'POST',
+                        data: { id: studentId },
+                        success: function () {
+                            Swal.fire(
+                                'Deleted!',
+                                'The student was successfully deleted.',
+                                'success'
+                            ).then(() => {
+                                window.location.reload();
+                            });
+                        },
+                        error: function (xhr) {
+                            Swal.fire(
+                                'Error!',
+                                'An error occurred: ' + xhr.responseText,
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+
+        $(document).on('click', '.soft-delete', function (e) {
+            e.preventDefault();
+            var studentId = $(this).data('id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This will soft delete the student!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, soft delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Student/SoftDelete',
+                        type: 'POST',
+                        data: { id: studentId },
+                        success: function () {
+                            Swal.fire(
+                                'Soft Deleted!',
+                                'The student was soft deleted.',
+                                'success'
+                            ).then(() => {
+                                window.location.reload();
+                            });
+                        },
+                        error: function (xhr) {
+                            Swal.fire(
+                                'Error!',
+                                'An error occurred: ' + xhr.responseText,
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+
+    <script>
+        const chartData = @Html.Raw(ViewBag.StudentClassStats ?? "[]");
+
+        if (chartData.length > 0) {
+            const ctx = document.getElementById('studentClassPieChart').getContext('2d');
+
+            const pieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: chartData.map(c => 'Class ' + c.Class),
+                    datasets: [{
+                        data: chartData.map(c => c.Count),
+                        backgroundColor: [
+                            '#4e73df',
+                            '#1cc88a',
+                            '#36b9cc',
+                            '#f6c23e',
+                            '#e74a3b',
+                            '#858796'
+                        ],
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Students per Class'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+
+}

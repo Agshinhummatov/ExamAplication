@@ -1,0 +1,102 @@
+﻿@using ExamAplication.Admin.Models.Student
+@using Newtonsoft.Json
+@model StudentCreate
+
+@{
+    ViewData["Title"] = "Add Student";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4"><i class="bi bi-plus-circle"></i> Add New Student</h2>
+
+    <form id="studentForm" asp-action="Create" method="post" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label for="StudentNumber" class="form-label">Student Number</label>
+            <input type="number" class="form-control" id="StudentNumber" name="StudentNumber" min="0" max="99999" required
+                   value="@Model?.StudentNumber" />
+            <div class="invalid-feedback">
+                Student number is required and must be a 5-digit number (0–99999).
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="FirstName" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="FirstName" name="FirstName" maxlength="30" required
+                   value="@Model?.FirstName" />
+            <div class="invalid-feedback">
+                First name is required and must be at most 30 characters.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="LastName" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="LastName" name="LastName" maxlength="30" required
+                   value="@Model?.LastName" />
+            <div class="invalid-feedback">
+                Last name is required and must be at most 30 characters.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="Class" class="form-label">Class</label>
+            <input type="number" class="form-control" id="Class" name="Class" min="1" max="99" step="1" required
+                   value="@Model?.Class" />
+            <div class="invalid-feedback">
+                Class must be a number between 1 and 99.
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Add Student</button>
+        <a href="@Url.Action("Index")" class="btn btn-secondary ms-2"><i class="bi bi-x-circle"></i> Cancel</a>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        (function () {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+        })();
+
+        @if (TempData["Success"] != null)
+        {
+            <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: '@TempData["Success"]'
+                });
+            </text>
+        }
+
+        @if (TempData["ErrorList"] != null)
+        {
+            var errorList = JsonConvert.DeserializeObject<List<string>>(TempData["ErrorList"].ToString());
+            <text>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Errors',
+                    html: `<ul>
+                    @foreach (var err in errorList)
+                    {
+                                            <li>@err</li>
+                    }
+                                </ul>`
+                });
+            </text>
+        }
+    </script>
+}

@@ -1,0 +1,120 @@
+﻿@using ExamAplication.Admin.Models.Lesson
+@using Newtonsoft.Json
+@model LessonCreate
+
+@{
+    ViewData["Title"] = "Add Lesson";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4"><i class="bi bi-plus-circle"></i> Add New Lesson</h2>
+
+    <form id="lessonForm" asp-action="Create" method="post" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label for="LessonCode" class="form-label">Lesson Code</label>
+            <input type="text" class="form-control" id="LessonCode" name="LessonCode" maxlength="3" required
+                   value="@Model?.LessonCode" />
+            <div class="invalid-feedback">
+                Lesson code is required and must be at most 3 characters long.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="LessonName" class="form-label">Lesson Name</label>
+            <input type="text" class="form-control" id="LessonName" name="LessonName" maxlength="30" required
+                   value="@Model?.LessonName" />
+            <div class="invalid-feedback">
+                Lesson name is required and must be at most 30 characters long.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="Class" class="form-label">Class</label>
+            <input type="number" class="form-control" id="Class" name="Class" min="1" max="9" required
+                   value="@Model?.Class" />
+            <div class="invalid-feedback">
+                Class is required and must be between 1 and 9.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="TeacherFirstName" class="form-label">Teacher First Name</label>
+            <input type="text" class="form-control" id="TeacherFirstName" name="TeacherFirstName" maxlength="20" required
+                   value="@Model?.TeacherFirstName" />
+            <div class="invalid-feedback">
+                Teacher's first name is required and must be at most 20 characters long.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="TeacherLastName" class="form-label">Teacher Last Name</label>
+            <input type="text" class="form-control" id="TeacherLastName" name="TeacherLastName" maxlength="20" required
+                   value="@Model?.TeacherLastName" />
+            <div class="invalid-feedback">
+                Teacher's last name is required and must be at most 20 characters long.
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Add Lesson</button>
+        <a href="@Url.Action("Index")" class="btn btn-secondary ms-2"><i class="bi bi-x-circle"></i> Cancel</a>
+    </form>
+
+
+    
+</div>
+
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })();
+
+        @if (TempData["Success"] != null)
+        {
+            <text>
+                <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: '@TempData["Success"]'
+                });
+             </script>
+            </text>
+        }
+
+            
+        @if (TempData["ErrorList"] != null)
+        {
+            var errorList = JsonConvert.DeserializeObject<List<string>>(TempData["ErrorList"].ToString());
+
+            <text>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Errors',
+                    html: `<ul>
+                    @foreach (var err in JsonConvert.DeserializeObject<List<string>>(TempData["ErrorList"].ToString()))
+                    {
+                                            <li>@err</li>
+                    }
+                                </ul>`
+                });
+            </text>
+        }
+    </script>
+}

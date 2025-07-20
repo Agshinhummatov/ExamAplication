@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_Layout";
+    var lessonCount = ViewBag.LessonCount;
+    var studentCount = ViewBag.StudentCount;
+    var examCount = ViewBag.ExamCount;
+}
+
+
+<h2>Dashboard Statistics</h2>
+
+<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+
+<script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+
+<script>
+    window.onload = function () {
+        var chart = new CanvasJS.Chart("chartContainer", {
+            animationEnabled: true,
+            title: {
+                text: "Examination System Overview"
+            },
+            data: [{
+                type: "column",
+                dataPoints: [
+                    { label: "Lessons", y: @lessonCount },
+                    { label: "Student", y: @studentCount },
+                    { label: "Exam", y: @examCount }
+                ]
+            }]
+        });
+        chart.render();
+    }
+</script>
+
