@@ -239,15 +239,16 @@ Bütün POST/PUT əməliyyatlarında OperationResult ilə uğur və ya səhv mes
 
 ## 📸 Screenshots — Exam Management System
 
-[![Screenshot 1](https://i.imgur.com/jtBPBv4.png)](https://i.imgur.com/jtBPBv4.png)  
-[![Screenshot 2](https://i.imgur.com/hxilRNG.png)](https://i.imgur.com/hxilRNG.png)  
-[![Screenshot 3](https://i.imgur.com/rS6b3c4.png)](https://i.imgur.com/rS6b3c4.png)  
-[![Screenshot 4](https://i.imgur.com/hfhS0Ka.png)](https://i.imgur.com/hfhS0Ka.png)  
-[![Screenshot 5](https://i.imgur.com/lkNtiNc.png)](https://i.imgur.com/lkNtiNc.png)  
-[![Screenshot 6](https://i.imgur.com/muLOuD0.png)](https://i.imgur.com/muLOuD0.png)  
-[![Screenshot 7](https://i.imgur.com/C7vLdOz.png)](https://i.imgur.com/C7vLdOz.png)  
-[![Screenshot 8](https://i.imgur.com/MNR3bFF.png)](https://i.imgur.com/MNR3bFF.png)  
-[![Screenshot 9](https://i.imgur.com/6YNRzQr.png)](https://i.imgur.com/6YNRzQr.png)
+![Screenshot 1](https://i.imgur.com/jtBPBv4.png)
+![Screenshot 2](https://i.imgur.com/hxilRNG.png)
+![Screenshot 3](https://i.imgur.com/rS6b3c4.png)
+![Screenshot 4](https://i.imgur.com/hfhS0Ka.png)
+![Screenshot 5](https://i.imgur.com/lkNtiNc.png)
+![Screenshot 6](https://i.imgur.com/muLOuD0.png)
+![Screenshot 7](https://i.imgur.com/C7vLdOz.png)
+![Screenshot 8](https://i.imgur.com/MNR3bFF.png)
+![Screenshot 9](https://i.imgur.com/6YNRzQr.png)
+
 
 
 
