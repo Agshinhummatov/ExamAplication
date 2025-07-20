@@ -35,7 +35,7 @@ Layihə aşağıdakı əsas laylardan ibarətdir:
 - `MediatR` vasitəsilə sorğu və əmr yönləndirmələri  
 - `ApiResponse<T>` ilə cavabların standartlaşdırılması
 
-### 3. **Infrastructure Layer** (`Exam.Infrastructure`)
+### 3. **Infrastructure Layer** (`ExamAplication.Infrastructure`)
 
 - External servis inteqrasiyası (məsələn, Email, Logger, Cache)  
 - Konfiqurasiya və loglama ilə əlaqəli xidmətlər
@@ -145,7 +145,46 @@ Repository və Unit of Work patternləri database əməliyyatlarını effektiv i
 
 CQRS və MediatR əməliyyatların idarəsini daha səliqəli və aydın edir.
 
-Qlobal Exception Handler isə sistemin stabil işləməsini və səhvlərin düzgün idarə olunmasını təmin edir.
+🛡️ Qlobal Səhv Tutucu (Global Exception Handler)
+🇦🇿 Azərbaycan dilində
+Qlobal Exception Handler, API-də baş verən gözlənilməz istisnaları (exception) mərkəzləşdirilmiş şəkildə idarə etməyə imkan verir. Bu handler bütün middleware-lərdən sonra işləyir və sistemdə yaranan istisnalara (məsələn, NullReferenceException, SqlException) uyğun olaraq standart JSON cavabı qaytarır.
+Handler aşağıdakı struktura sahibdir:
+public async Task Invoke(HttpContext context)
+{
+    try
+    {
+        await _next(context);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Unhandled exception occurred.");
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+        var response = OperationResult.Failed("An unexpected error occurred.", new[] { ex.Message });
+        var json = JsonSerializer.Serialize(response);
+        await context.Response.WriteAsync(json);
+    }
+}
+
+💡 Əlavə olaraq, OperationResult modelindən istifadə edərək bütün səhv cavabları vahid formatda təqdim edilir:
+   {
+  "success": false,
+  "message": "An unexpected error occurred.",
+  "errors": [ "Object reference not set to an instance of an object." ],
+  "statusCode": 500
+}
+
+
+Bu yanaşmanın üstünlükləri:
+
+İstisnalar try-catch ilə tək-tək yazılmaq əvəzinə mərkəzi olaraq idarə olunur.
+
+İstifadəçiyə daha aydın və standart formatda cavab təqdim olunur.
+
+ILogger vasitəsilə bütün səhvlər loq fayllarına yazılır.
+
+Sistem stabilliyini artırır və debugging prosesini asanlaşdırır.
 
 ---------------------------------------------------------------------
 API Documentation — Exam Management System
@@ -198,19 +237,18 @@ ListAdvancedFilter və GetFilteredLessons kimi metodlarda səhifələmə (page, 
 
 Bütün POST/PUT əməliyyatlarında OperationResult ilə uğur və ya səhv mesajları qaytarılır.
 
-<img width="1360" height="768" alt="image" src="https://github.com/user-attachments/assets/2da91fe8-27b8-4040-bc71-48eadb9f7e0c" />
+## 📸 Screenshots — Exam Management System
 
-<img width="1360" height="768" alt="image" src="https://github.com/user-attachments/assets/fa31cbeb-b062-4b72-a185-c36bc21fa597" />
+[![Screenshot 1](https://i.imgur.com/jtBPBv4.png)](https://i.imgur.com/jtBPBv4.png)  
+[![Screenshot 2](https://i.imgur.com/hxilRNG.png)](https://i.imgur.com/hxilRNG.png)  
+[![Screenshot 3](https://i.imgur.com/rS6b3c4.png)](https://i.imgur.com/rS6b3c4.png)  
+[![Screenshot 4](https://i.imgur.com/hfhS0Ka.png)](https://i.imgur.com/hfhS0Ka.png)  
+[![Screenshot 5](https://i.imgur.com/lkNtiNc.png)](https://i.imgur.com/lkNtiNc.png)  
+[![Screenshot 6](https://i.imgur.com/muLOuD0.png)](https://i.imgur.com/muLOuD0.png)  
+[![Screenshot 7](https://i.imgur.com/C7vLdOz.png)](https://i.imgur.com/C7vLdOz.png)  
+[![Screenshot 8](https://i.imgur.com/MNR3bFF.png)](https://i.imgur.com/MNR3bFF.png)  
+[![Screenshot 9](https://i.imgur.com/6YNRzQr.png)](https://i.imgur.com/6YNRzQr.png)
 
-<img width="1360" height="768" alt="image" src="https://github.com/user-attachments/assets/f71a8d4f-4e34-4ce9-b0e4-3f1950b01503" />
-
-<img width="1360" height="768" alt="image" src="https://github.com/user-attachments/assets/27b37921-2c22-4da3-9acc-085152bd87ad" />
-
-<img width="1360" height="768" alt="image" src="https://github.com/user-attachments/assets/0715e3dd-34b4-4dac-a328-299ea8f52475" />
-
-<img width="1360" height="768" alt="image" src="https://github.com/user-attachments/assets/ecaa5b7d-f9d5-4b7c-95e7-588e6c22ede5" />
-
-<img width="1360" height="768" alt="image" src="https://github.com/user-attachments/assets/c9d81eb8-baca-4315-b2b2-774f0d009c10" />
 
 
 
@@ -358,7 +396,52 @@ public void ConfigureServices(IServiceCollection services)
 
 ## 🚨 Global Exception Handling
 
-A global exception handler middleware is implemented to catch unexpected errors across all APIs, returning standardized JSON error responses. This ensures system stability and consistent error logging.
+🇬🇧 English Version
+Global Exception Handler is a centralized middleware that catches any unhandled exceptions in the API pipeline and returns a standard JSON response. Instead of wrapping every controller with try-catch, this approach makes error handling consistent, maintainable, and user-friendly.
+
+Benefits of this approach:
+
+Catches all unhandled exceptions (e.g., NullReferenceException, SqlException) in one place.
+
+Ensures the user always receives a clear and formatted JSON error.
+
+Logs the exception with full stack trace using ILogger.
+
+Improves system stability and simplifies debugging.
+
+Handler structure:
+
+csharp
+Copy
+Edit
+public async Task Invoke(HttpContext context)
+{
+    try
+    {
+        await _next(context);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Unhandled exception occurred.");
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+        var response = OperationResult.Failed("An unexpected error occurred.", new[] { ex.Message });
+        var json = JsonSerializer.Serialize(response);
+        await context.Response.WriteAsync(json);
+    }
+}
+💡 The OperationResult model ensures all error responses follow a standard format:
+
+json
+Copy
+Edit
+{
+  "success": false,
+  "message": "An unexpected error occurred.",
+  "errors": [ "Object reference not set to an instance of an object." ],
+  "statusCode": 500
+}
 
 ---
 
